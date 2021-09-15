@@ -1,16 +1,19 @@
 [
     {
-        "id": "1",
+        "todoId": "1",
+        "userId": "1",
         "text": "Saludar a juanca",
         "done": false
     },
     {
-        "id": "2",
+        "todoId": "2",
+        "userId": "1",
         "text": "Jeru",
         "done": false
     },
     {
-        "id": "3",
+        "todoId": "3",
+        "userId": "1",
         "text": "Sarah Vaughan and Clifford Brown",
         "done": false
     }
