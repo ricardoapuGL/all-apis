@@ -1,0 +1,16 @@
+- [ ] simple hello world api in
+    - [x] NodeJS + express
+    - [x] Go + Gin
+    - [ ] Python + Flask
+    - [ ] Python + Django
+    - [ ] Java?? JEE??
+    - [ ] C#??
+- [ ] simple DB access in all langs
+    - [ ] NodeJS + express
+    - [ ] Go + Gin
+    - [ ] Python + Flask
+    - [ ] Python + Django
+    - [ ] Java?? JEE??
+    - [ ] C#??
+- [ ] simple TODO app-backend 
+- [ ] simple TODO app-frontend
