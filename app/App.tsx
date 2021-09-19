@@ -20,41 +20,50 @@
  } from 'react-native';
  import CheckBox from '@react-native-community/checkbox';
  import {
-   Colors,
- } from 'react-native/Libraries/NewAppScreen';
-
- import {
    Todo, todos
  } from './todo/todo'
- 
+import Delete from './icons/delete' 
 
+interface TodoCardProps extends Todo {
+  idx: number
+  onCheckboxChange: (idx: number) => void 
+}
 
- const TodoCard: React.FC<Todo> = ({todoId, text, done}: Todo) => {
-   const [doneState, setDoneState] = useState(done)
+ const TodoCard: React.FC<TodoCardProps> = ({ text, done, onCheckboxChange, idx }: TodoCardProps) => {
    const isDarkMode = useColorScheme() === 'dark';
    return (
-     <View style={styles.sectionContainer} key={todoId}>
+     <View style={[styles.sectionContainer,{
+       backgroundColor: isDarkMode ? 'black' : 'white'
+     }]}>
        <Text
          style={[
            styles.sectionTitle,
            {
-             color: isDarkMode ? Colors.white : Colors.black,
+             color: isDarkMode ? 'white' : 'black',
            },
          ]}>
          {text}
        </Text>
-        <CheckBox onValueChange={() => setDoneState(!doneState)} value={doneState}/>
+        <CheckBox onValueChange={() => {
+          onCheckboxChange(idx)}} value={done}/>
+        <Delete color={isDarkMode ? 'white' : 'black'} />
      </View>
    );
  };
 
  const App = (): JSX.Element => {
    const isDarkMode = useColorScheme() === 'dark';
+   const [doneState, setDoneState] = useState(todos.map(t=> t.done))
 
+  const onChange = (idx: number) => {
+    const newState: React.SetStateAction<boolean[]> = []
+    doneState[idx] = !doneState[idx]
+    doneState.forEach(item => newState.push(item))
+    setDoneState(newState)
+  }
    const backgroundStyle = {
      backgroundColor: 'black',
    };
-   console.log(todos)
    return (
      <SafeAreaView style={backgroundStyle}>
        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -64,12 +73,11 @@
          
          <View
            style={{
-             backgroundColor: isDarkMode ? Colors.black : Colors.white,
+             backgroundColor: isDarkMode ? 'black' : 'white',
            }}>
 
-           {todos.map((todo) => {
-             console.log(todo)
-             return <TodoCard key={todo.todoId}{...todo}/>
+           {todos.map((todo, i) => {
+             return <TodoCard key={i} idx={i} {...todo} done={doneState[i]} onCheckboxChange={onChange} />
            })}
          </View>
        </ScrollView>
@@ -79,8 +87,10 @@
 
  const styles = StyleSheet.create({
    sectionContainer: {
-     marginTop: 32,
      paddingHorizontal: 24,
+     paddingVertical: 24,
+     display: 'flex',
+     flexDirection: 'row'
    },
    sectionTitle: {
      fontSize: 24,
