@@ -74,13 +74,14 @@ const App = (): JSX.Element => {
     }
   }, [])
 
-  const [doneState, setDoneState] = useState(todos.map(t => t.done))
 
   const onChange = (idx: number) => {
-    const newState: React.SetStateAction<boolean[]> = []
-    doneState[idx] = !doneState[idx]
-    doneState.forEach(item => newState.push(item))
-    setDoneState(newState)
+    const newState: React.SetStateAction<Todo[]> = todos
+    newState[idx].done = !todos[idx].done
+    todos.forEach(item => newState.push(item))
+    setTodos(newState)
+    console.log(newState)
+    console.log(idx)
   }
   const backgroundStyle = {
     backgroundColor: 'black',
@@ -98,7 +99,7 @@ const App = (): JSX.Element => {
           }}>
 
           {todos.map((todo, i) => {
-            return <TodoCard key={i} idx={i} {...todo} done={doneState[i]} onCheckboxChange={onChange} />
+            return <TodoCard key={i} idx={i} {...todo} onCheckboxChange={onChange} />
           })}
         </View>
       </ScrollView>

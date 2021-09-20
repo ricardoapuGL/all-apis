@@ -13,6 +13,7 @@ app.use(express.urlencoded({
     extended: true
   }))
 app.use(express.json())
+
 app.get('/todo', async (req, res, next) => {
     try {
         res.header("Content-Type",'application/json');

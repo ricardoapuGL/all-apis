@@ -1,4 +1,4 @@
 - [x] DB conection
 - [x] post/:id
-- [ ] delete/:id
+- [x] delete/:id
 - [x] error handling
