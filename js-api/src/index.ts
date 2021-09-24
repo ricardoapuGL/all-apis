@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express'
-import db from './database'
 import dotenv from 'dotenv'
 import path from 'path'
 import { Todo } from './todo'
+import { createTodo, deleteTodo, getTodos, patchTodo } from './todo/controller'
+import db from './database'
 
 //configure dotenv
 dotenv.config({ path: path.resolve(__dirname, '../.env')})
@@ -16,15 +17,10 @@ app.use(express.json())
 
 app.get('/todo', async (req, res, next) => {
     try {
+        const todos = await getTodos()
+        console.log(todos)
         res.header("Content-Type",'application/json');
-        const { rows } = await db.query(`
-        SELECT 
-            todo_id as "todoId", 
-            user_id as "userId", 
-            text as "text", 
-            done as "done" 
-        FROM todo`)
-        res.send(JSON.stringify(rows, null, 4));
+        res.send(JSON.stringify(todos, null, 4));
     } catch (error) {
         next(error)   
     }
@@ -39,18 +35,25 @@ app.post('/todo', async (req, res, next) => {
         if(!todo){
             throw Error('No todo passed to create new todo')
         }
-        const { rows } = await db.query(`
-        INSERT INTO 
-            todo(text, done) 
-        VALUES 
-            ($1, $2) 
-        RETURNING 
-            todo_id as "todoId", 
-            text as "text", 
-            done as "done"
-        `, [todo.text, todo.done])
+        const newTodo = await createTodo(todo) 
         res.header("Content-Type",'application/json');
-        res.send(JSON.stringify(rows, null, 4));
+        res.send(JSON.stringify(newTodo, null, 4));
+    } catch (error) {
+        next(error)   
+    }
+})
+
+app.patch('/todo/:id', async (req, res, next) => {
+    try{
+        const todo: Partial<Todo> = req.body
+        const id = req.params.id
+        //TODO add validation
+        if(!todo || !id){
+            throw Error('No todo passed to update new todo')
+        }
+        console.log(req.body)
+        const newTodo = await patchTodo({...todo, todoId: id})
+        res.send(JSON.stringify(newTodo, null, 4));
     } catch (error) {
         next(error)   
     }
@@ -63,9 +66,8 @@ app.delete('/todo/:id', async (req, res, next) => {
         if(!id){
             throw Error('No id passed to delete todo')
         }
-        const result = await db.query(`DELETE FROM  todo WHERE todo_id = $1`, [id])
-        console.log(result)
-        res.send(JSON.stringify(result, null, 4));
+        await deleteTodo(id)
+        res.sendStatus(200);
     } catch (error) {
         next(error)   
     }
@@ -73,7 +75,7 @@ app.delete('/todo/:id', async (req, res, next) => {
 
 app.use(function (err: Error, req: Request, res: Response) {
     console.error(err.stack)
-    res.status(500).send('Something broke!')
+    res.sendStatus(500).send('Something broke!')
   })
 
 // start the Express server

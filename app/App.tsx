@@ -20,17 +20,17 @@ import {
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import {
-  Todo, todos
+  Todo
 } from './todo/todo'
 import Delete from './icons/delete'
-import axios from 'axios';
+import axios, { CancelTokenSource } from 'axios';
 
-interface TodoCardProps extends Todo {
-  idx: number
-  onCheckboxChange: (idx: number) => void
+interface TodoCardProps {
+  todo: Todo
+  onCheckboxChange: (todo: Todo) => Promise<void>
 }
 
-const TodoCard: React.FC<TodoCardProps> = ({ text, done, onCheckboxChange, idx }: TodoCardProps) => {
+const TodoCard: React.FC<TodoCardProps> = ({ todo, onCheckboxChange }: TodoCardProps) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={[styles.sectionContainer, {
@@ -43,11 +43,13 @@ const TodoCard: React.FC<TodoCardProps> = ({ text, done, onCheckboxChange, idx }
             color: isDarkMode ? 'white' : 'black',
           },
         ]}>
-        {text}
+        {todo.text}
       </Text>
-      <CheckBox onValueChange={() => {
-        onCheckboxChange(idx)
-      }} value={done} />
+      <CheckBox onValueChange={async (e) => {
+        console.log(e);
+        await onCheckboxChange(todo)
+      }
+      } value={todo.done} />
       <Delete color={isDarkMode ? 'white' : 'black'} />
     </View>
   );
@@ -57,16 +59,22 @@ const App = (): JSX.Element => {
   const isDarkMode = useColorScheme() === 'dark';
   const [todos, setTodos] = useState<Todo[]>([])
 
+  const getData = async (source?: CancelTokenSource) => {
+    try {
+      const todos = (await axios.get('http://10.0.2.2:8080/todo', { cancelToken: source && source.token })).data
+      setTodos(todos)
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
   useEffect(() => {
     // get TODOS
+    let isSubscribed = true
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    let isSubscribed = true
     if (isSubscribed) {
-      axios.get('http://10.0.2.2:8080/todo', { cancelToken: source.token }).then(res => {
-        console.log(res.data)
-        setTodos(res.data)
-      }).catch(err => console.error(err.stack))
+      getData(source)
     }
     return () => {
       source.cancel()
@@ -75,13 +83,19 @@ const App = (): JSX.Element => {
   }, [])
 
 
-  const onChange = (idx: number) => {
-    const newState: React.SetStateAction<Todo[]> = todos
-    newState[idx].done = !todos[idx].done
-    todos.forEach(item => newState.push(item))
-    setTodos(newState)
-    console.log(newState)
-    console.log(idx)
+  const onChange = async (todo: Todo) => {
+    try {
+      const response = await axios.patch(`http://10.0.2.2:8080/todo/${todo.todoId}`, {
+        body: {
+          done: !todo.done
+        }
+      })
+      console.log(response)
+      getData()
+    } catch (error) {
+      console.error(error.message)
+    }
+
   }
   const backgroundStyle = {
     backgroundColor: 'black',
@@ -99,7 +113,7 @@ const App = (): JSX.Element => {
           }}>
 
           {todos.map((todo, i) => {
-            return <TodoCard key={i} idx={i} {...todo} onCheckboxChange={onChange} />
+            return <TodoCard key={i} todo={todo} onCheckboxChange={onChange} />
           })}
         </View>
       </ScrollView>
