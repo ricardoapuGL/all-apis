@@ -9,7 +9,8 @@ export const getTodos = async (): Promise<Todo[]> => {
         user_id as "userId", 
         text as "text", 
         done as "done" 
-    FROM todo`)
+    FROM todo
+    ORDER BY todo_id`, [])
     return rows as Todo[]
 }
 
@@ -52,13 +53,13 @@ export const patchTodo = async (todo: Partial<Todo>): Promise<Todo> => {
     SET 
     text = $1, 
     done = $2
-    WHERE todo_id = ${updatedTodo.todoId}
+    WHERE todo_id = $3
     
     RETURNING 
         todo_id as "todoId", 
         text as "text", 
         done as "done"
-    `, [updatedTodo.text, todo.done])
-
+    `.replace(/\n/,' '), [updatedTodo.text, updatedTodo.done, updatedTodo.todoId])
+    console.log(rows)
     return rows[0] as Todo
 }

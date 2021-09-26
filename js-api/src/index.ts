@@ -6,77 +6,78 @@ import { createTodo, deleteTodo, getTodos, patchTodo } from './todo/controller'
 import db from './database'
 
 //configure dotenv
-dotenv.config({ path: path.resolve(__dirname, '../.env')})
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 const app = express()
 const port = process.env.PORT // default port to listen
 app.use(express.urlencoded({
     extended: true
-  }))
+}))
 app.use(express.json())
 
 app.get('/todo', async (req, res, next) => {
     try {
         const todos = await getTodos()
         console.log(todos)
-        res.header("Content-Type",'application/json');
+        res.header("Content-Type", 'application/json');
         res.send(JSON.stringify(todos, null, 4));
     } catch (error) {
-        next(error)   
+        next(error)
     }
 
 })
 
 app.post('/todo', async (req, res, next) => {
-    try{
+    try {
         const todo: Todo = req.body
         console.log(todo)
         //TODO add validation
-        if(!todo){
+        if (!todo) {
             throw Error('No todo passed to create new todo')
         }
-        const newTodo = await createTodo(todo) 
-        res.header("Content-Type",'application/json');
+        const newTodo = await createTodo(todo)
+        res.header("Content-Type", 'application/json');
         res.send(JSON.stringify(newTodo, null, 4));
     } catch (error) {
-        next(error)   
+        next(error)
     }
 })
 
 app.patch('/todo/:id', async (req, res, next) => {
-    try{
+    try {
         const todo: Partial<Todo> = req.body
         const id = req.params.id
         //TODO add validation
-        if(!todo || !id){
+        console.log({ ...todo, todoId: id })
+        if (!todo || !id) {
             throw Error('No todo passed to update new todo')
         }
         console.log(req.body)
-        const newTodo = await patchTodo({...todo, todoId: id})
+        const newTodo = await patchTodo({ ...todo, todoId: id })
         res.send(JSON.stringify(newTodo, null, 4));
     } catch (error) {
-        next(error)   
+        next(error)
     }
 })
 
 app.delete('/todo/:id', async (req, res, next) => {
-    try{
+    try {
         const id = req.params.id
         //TODO add validation
-        if(!id){
+        if (!id) {
             throw Error('No id passed to delete todo')
         }
         await deleteTodo(id)
-        res.sendStatus(200);
+        res.status(200).send({ id })
     } catch (error) {
-        next(error)   
+        next(error)
     }
 })
 
 app.use(function (err: Error, req: Request, res: Response) {
     console.error(err.stack)
-    res.sendStatus(500).send('Something broke!')
-  })
+    res.status(500).send('Something broke!')
+})
 
 // start the Express server
 const server = app.listen(port, () => {
