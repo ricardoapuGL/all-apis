@@ -2,7 +2,7 @@ import db from '../database'
 import { Todo } from '../todo'
 
 
-export const getTodos = async (): Promise<Todo[]> => {
+export const getTodos = async (limit = 100): Promise<Todo[]> => {
     const { rows } = await db.query(`
     SELECT 
         todo_id as "todoId", 
@@ -10,7 +10,8 @@ export const getTodos = async (): Promise<Todo[]> => {
         text as "text", 
         done as "done" 
     FROM todo
-    ORDER BY todo_id`, [])
+    ORDER BY todo_id
+    LIMIT $1`, [limit])
     return rows as Todo[]
 }
 
@@ -59,7 +60,7 @@ export const patchTodo = async (todo: Partial<Todo>): Promise<Todo> => {
         todo_id as "todoId", 
         text as "text", 
         done as "done"
-    `.replace(/\n/,' '), [updatedTodo.text, updatedTodo.done, updatedTodo.todoId])
+    `, [updatedTodo.text, updatedTodo.done, updatedTodo.todoId])
     console.log(rows)
     return rows[0] as Todo
 }

@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import path from 'path'
 import { Todo } from './todo'
@@ -74,7 +74,8 @@ app.delete('/todo/:id', async (req, res, next) => {
     }
 })
 
-app.use(function (err: Error, req: Request, res: Response) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(function (err: Error, req: Request, res: Response, _next: NextFunction) {
     console.error(err.stack)
     res.status(500).send('Something broke!')
 })

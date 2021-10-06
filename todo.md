@@ -1,15 +1,12 @@
 - [ ] simple hello world api in
-    - [x] NodeJS + express
+    - [x] NodeJS + express + pg-node
     - [x] Go + Gin
-    - [ ] Python + Flask
     - [ ] Python + Django
-    - [ ] Java?? JEE??
-    - [ ] C#??
+    - [ ] Rust + Actix
+
 - [ ] simple DB access in all langs
     - [x] NodeJS + express
     - [ ] Go + Gin
-    - [ ] Python + Flask
     - [ ] Python + Django
-    - [ ] Java?? JEE??
-    - [ ] C#??
+  
 - [x] simple TODO app-frontend

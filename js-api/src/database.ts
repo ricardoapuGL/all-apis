@@ -7,6 +7,10 @@ const pool = new Pool({
     database: process.env.PGDATABASE || 'postgres',
     password: process.env.PGPASSWORD ||  '1234',
     port: parseInt(process.env.PGPORT || '5432'),
+    max: 4,
+    min: 1,
+    connectionTimeoutMillis: 0,
+    idleTimeoutMillis: 0,
   })
 
   export default {
