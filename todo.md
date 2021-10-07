@@ -5,8 +5,9 @@
     - [ ] Rust + Actix
 
 - [ ] simple DB access in all langs
-    - [x] NodeJS + express
-    - [ ] Go + Gin
+    - [x] NodeJS + node-pg
+    - [ ] Go + go-pg
     - [ ] Python + Django
+    - [ ] Rust + diesel/rust-postgres
   
 - [x] simple TODO app-frontend
