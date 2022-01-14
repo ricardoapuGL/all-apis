@@ -43,10 +43,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Todo(models.Model):
     """Todo object to be used a a todo"""
     title = models.CharField(max_length=255)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
 
     def __str__(self):
         return self.title
